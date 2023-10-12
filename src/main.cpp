@@ -11,7 +11,7 @@ int main() {
     quill::Logger *logger = quill::create_logger("RiskTrackingLogger");
     logger->set_log_level(quill::LogLevel::TraceL2);
     // logging setup end
-    
+
     std::vector <Trade> trades;
     trades.push_back(Trade(7, false, 1.4));
     RiskTracker riskTracker(0.0, trades);
