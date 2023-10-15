@@ -1,38 +1,23 @@
 import timeit
 import math
 
-def sieve_eratosthenes(n):
-    is_prime = [True] * (n + 1)
-    # 0 and 1 are not prime numbers
-    is_prime[0] = False
-    is_prime[1] = False
+def optimized_sieve(n):
+    # List to store prime factors
+    factors = [list() for _ in range(n + 1)]
 
-    for p in range(2, int(math.sqrt(n)) + 1):
-        if is_prime[p]:
-            for i in range(p * p, n + 1, p):
-                is_prime[i] = False
+    for p in range(2, n + 1):
+        if not factors[p]: # If the number is a prime (has no factors yet)
+            for multiple in range(p, n + 1, p):
+                factors[multiple].append(p)
 
-    return [i for i, prime in enumerate(is_prime) if prime]
+    return factors
 
 def disasterCode():
-    primes = sieve_eratosthenes(1000)
+    factors = optimized_sieve(2500)
 
-    # Create a dictionary of prime factors
-    primes_table = {i: set() for i in range(2, 1000)}
-
-    # Fill the dictionary
-    for num in range(2, 1000):
-        n = num
-        # Iterate over the list of prime numbers
-        for p in primes:
-            while n % p == 0:
-                # Add the prime factor to the set
-                primes_table[num].add(p)
-                # Divide the number by the prime factor
-                n //= p
-            # If the number is 1, stop the loop
-            if n == 1:
-                break
+    # This loop is just to "use" the factors to ensure a fair comparison
+    for num in range(2, 2500):
+        _ = factors[num]
 
 # Benchmark the code
 if __name__ == "__main__":
