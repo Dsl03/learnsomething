@@ -30,7 +30,75 @@ HackathonBot::HackathonBot() {};
 
 
 void HackathonBot::takeAction(float price){
-    return;
+
+    // Check for up/down days
+    if (!this->pricesHistory.empty()) {
+        if (price > this->pricesHistory.back()) {
+            this->priceUpDays++;
+            this->priceDownDays = 0;
+        } else if (price < this->pricesHistory.back()) {
+            this->priceDownDays++;
+            this->priceUpDays = 0;
+        }
+    }
+
+    // add to prices history
+    this->pricesHistory.push_back(price);
+
+    if (this->holding) { // Sell
+        if (priceUpDays >= 52 || priceDownDays >= 47) {
+            this->sell();
+            return;
+        }
+
+        const float priceBought = this->pricesHistory.front();
+        if (price / priceBought > 1.89 || price / priceBought < 0.38) {
+            this->sell();
+            return;
+        }
+
+        // Series Window
+
+        if (this->pricesHistory.size() > 3) {
+            const int n = this->pricesHistory.size();
+
+            const float firstSecond = this->pricesHistory[n-1] / this->pricesHistory[n-2];
+            const float secondThird = this->pricesHistory[n-2] / this->pricesHistory[n-3];
+            const float thirdFourth = this->pricesHistory[n-3] / this->pricesHistory[n-4];
+            const float firstFourth = this->pricesHistory[n-1] / this->pricesHistory[n-4];
+
+            if (thirdFourth >= 1.2 && secondThird <= 0.85 && firstSecond >= 1.3 && firstFourth >= 1.5) {
+                this->sell();
+                return;
+            }
+
+            if (thirdFourth <= 0.85 && secondThird >= 1.15 && firstSecond <= 0.75 && firstFourth <= 0.55) {
+                this->sell();
+                return;
+            }
+
+            if (this->pricesHistory.size() >= 10) {
+                float priceBought = this->pricesHistory.front();
+                for (const float &price : this->pricesHistory) {
+                    float priceRatio = price / priceBought;
+                    if (std::abs(priceRatio - 1) > 0.05) {
+                        return;
+                    }
+                }
+            }
+            this->sell();
+
+        }
+
+
+    }
+
+    else {
+        if (price < 52 || this->priceDownDays >= 5) {
+            this->buy();
+        }
+    }
+
 }
 
 double HackathonBot::getBalance(){
@@ -47,4 +115,5 @@ void HackathonBot::buy(){
 
 void HackathonBot::sell(){
     this->holding = false;
+    this->pricesHistory.clear();
 }
