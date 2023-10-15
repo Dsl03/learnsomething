@@ -1,22 +1,23 @@
 import timeit
+import math
+
+def optimized_sieve(n):
+    # List to store prime factors
+    factors = [list() for _ in range(n + 1)]
+
+    for p in range(2, n + 1):
+        if not factors[p]: # If the number is a prime (has no factors yet)
+            for multiple in range(p, n + 1, p):
+                factors[multiple].append(p)
+
+    return factors
 
 def disasterCode():
-    for i in range (2,2500):
-        uniquePrimes = []
-        currentPrime = i
-        for j in range (2,i):
-            checkPrime = j
-            flag = False
-            for k in range (2,checkPrime-1):
-                if (j%k==0):
-                    flag = True
-                    break
-            if not flag and i%checkPrime==0 and checkPrime <= i:
-                while (currentPrime%checkPrime==0):
-                    currentPrime/=checkPrime
-                uniquePrimes.append(checkPrime)
-        if len(uniquePrimes) == 0:
-            uniquePrimes.append(i)
+    factors = optimized_sieve(2500)
+
+    # This loop is just to "use" the factors to ensure a fair comparison
+    for num in range(2, 2500):
+        _ = factors[num]
 
 # Benchmark the code
 if __name__ == "__main__":
@@ -25,9 +26,8 @@ if __name__ == "__main__":
 
     # Measure the execution time of disasterCode function
     times = []
-    for i in range(0,5):
+    for i in range(5):
         times.append(timeit.timeit(benchmark_code, setup=setup_code, number=1))
 
-    res = sum(times)/5
-
+    res = sum(times) / 5
     print(f"Average execution time after 5 runs: {res:.6f} seconds")
