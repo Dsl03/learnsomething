@@ -15,8 +15,14 @@ public:
     double getBalance();
     bool isHolding();
 private:
-    double balance;
-    bool holding;
+    double balance = 0;
+    bool holding = false;
+    int priceUpDays = 0;
+    int priceDownDays = 0;
+    std::vector<float> pricesHistory;
+    void buy();
+    void sell();
+
 };
 
 #endif //LEARNSOMETHING_HACKATHONBOT_H
